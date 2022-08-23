@@ -1,7 +1,6 @@
 transition={}
 
 function transition:init(goal)
-    print("transitioning")
     if not transition.on then
         transition.size=0
         transition.reached=false

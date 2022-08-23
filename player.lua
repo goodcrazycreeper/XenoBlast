@@ -7,10 +7,11 @@ function player:load()
     self.y=10
     self.sprite=1
     self.maxhp=10
+    self.speed=150
     self.hp=10
     self.walking=false
-    self.character=1
-    self.Image=love.graphics.newImage("images/characters/character-3.png")
+    self.character=menu_selected_character
+    self.Image=love.graphics.newImage("images/characters/character-"..tostring(self.character)..".png")
     self.quads={}
     self.walk_timer=1
     for i=0,3 do
@@ -20,7 +21,7 @@ end
 
 function player:update(dt)
     self:animate(dt)
-    self:input()
+    self:input(dt)
 end
 
 function player:animate(dt)
@@ -44,7 +45,7 @@ function player:animate(dt)
 end
 
 
-function player:input()
+function player:input(dt)
     local vec={x=0,y=0}
     if love.keyboard.isDown("w") then
         vec.y = vec.y - 1
@@ -59,12 +60,12 @@ function player:input()
         vec.x = vec.x + 1
     end
     vec.x,vec.y=normalize(vec.x,vec.y)
-    self:move(vec.x,vec.y)
+    self:move(vec.x,vec.y, dt)
 end
 
-function player:move(x,y)
-    self.x = self.x + x
-    self.y = self.y + y
+function player:move(x,y,dt)
+    self.x = self.x + x * dt * self.speed
+    self.y = self.y + y * dt * self.speed
 end
 
 function player:draw()
