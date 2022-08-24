@@ -1,16 +1,18 @@
 require("player")
 require("transition")
 require("bg")
+local bitser = require 'lib/bitser'
 
 state={'intro','menu','game','pull'}
-current_state = state[1]
+current_state = state[2]
 love.graphics.setBackgroundColor(0.7,0.3,0.1 , 1)
 window_width,window_height = love.graphics.getDimensions()
 
 
-function love.load()
-    love.filesystem.newFile("sus.txt")
 
+
+function love.load()
+    load_data()
     love.graphics.setDefaultFilter("nearest", "nearest")
     enter_state(current_state)
     
@@ -183,11 +185,11 @@ function state_draw(dt)
             love.graphics.push()
             love.graphics.setColor(1,1,1,1)
             love.graphics.scale(5, 5)
-            love.graphics.draw(my_characters[menu_selected_character], my_quads[character_frame], (window_width/2-120)/5, (window_height/2-120)/5)
+            love.graphics.draw(my_characters[tonumber(character_storage[menu_selected_character])], my_quads[character_frame], (window_width/2-120)/5, (window_height/2-120)/5)
             love.graphics.pop()
 
             --draw arrows
-            if menu_selected_character == 3 then
+            if menu_selected_character == #character_storage then
                 love.graphics.setColor(0.3,0.3,0.3,1)
             else
                 love.graphics.setColor(1,1,1,1)
@@ -255,8 +257,8 @@ function mousepressed(x,y)
                 menu_selected_character = menu_selected_character - 1
             end
             --clamps
-            if menu_selected_character > 3 then
-                menu_selected_character = 3
+            if menu_selected_character > #character_storage then
+                menu_selected_character = #character_storage
             end
        
             if menu_selected_character < 1 then
@@ -284,6 +286,22 @@ function CheckCollision(x1,y1,w1,h1, x2,y2,w2,h2)
            y2 < y1+h1
   end
 
+function save_data()
+    local data=bitser.dumps(character_storage)
+    love.filesystem.write('save.sav',data)
+end
+
 function load_data()
-    local file = io.open ('save.sav', w)
+    if love.filesystem.getInfo('save.sav') then
+        local string=love.filesystem.read('save.sav')
+        print(string)
+        character_storage=bitser.loads(string)
+    else
+        character_storage={'1'}
+    end
+
+end
+
+function love.quit()
+    save_data()
 end
