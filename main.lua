@@ -1,25 +1,28 @@
-require("player")
-require("transition")
-require("bg")
+require('player')
+require('transition')
+require('bg')
+require('conf')
+
 local bitser = require 'lib/bitser'
+
+
 
 state={'intro','menu','game','pull'}
 current_state = state[2]
 love.graphics.setBackgroundColor(0.7,0.3,0.1 , 1)
 window_width,window_height = love.graphics.getDimensions()
 
-
-
-
 function love.load()
     load_data()
     love.graphics.setDefaultFilter("nearest", "nearest")
     enter_state(current_state)
-    
+    config={}
 end
 
-
 function love.update(dt)
+    window_width = 1280
+    window_height = 720
+
     update_mouse()
     bg:update(dt)
     state_update(dt)
@@ -28,9 +31,11 @@ end
 
 
 function love.draw()
+
     bg:draw()
     state_draw(current_state)
-    transition:draw()
+    transition:draw() 
+
 end
 
 function switch_state(state)
@@ -57,12 +62,27 @@ function enter_state(index)
         intro_timer=5
         logo_x = 1500
         love.graphics.setFont(love.graphics.newFont('fonts/slkscr.ttf',100))
-        logo_image = love.graphics.newImage("images/grape_pfp_pixel.png")
+        logo_image = love.graphics.newImage("images/ui/grape_pfp_pixel.png")
     elseif index=='menu' then
+        empty = love.graphics.newImage('images/ui/empty_upgrade.png')
+        full = love.graphics.newImage('images/ui/full_upgrade.png')
+
+        circle_icon=love.graphics.newImage('images/ui/black_circle.png')
+        icons={love.graphics.newImage('images/ui/attack_icon.png'),love.graphics.newImage('images/ui/health_icon.png'),love.graphics.newImage('images/ui/speed_icon.png')}
+        --attack
+        --health_icon
+        --speed_icon
+
+
         bg:init()
+
+        buy_button={w=400,h=100}
+        buy_button.x=window_width/2-buy_button.w/2
+        buy_button.y=window_height/4*3-buy_button.h/2
+
         window_width,window_height = love.graphics.getDimensions()
-        left_arrow_image=love.graphics.newImage('images/left_arrow.png')
-        right_arrow_image=love.graphics.newImage('images/right_arrow.png')
+        left_arrow_image=love.graphics.newImage('images/ui/left_arrow.png')
+        right_arrow_image=love.graphics.newImage('images/ui/right_arrow.png')
         menu_selected_character=1
         character_frame_tick=0
         character_frame=1
@@ -79,13 +99,17 @@ function enter_state(index)
             table.insert(my_quads, love.graphics.newQuad(i * 48, 0,48 ,48 ,my_characters[1]))
         end
         
+        --config variables
+        check = love.graphics.newImage('images/ui/check.png')
+        fullscreen_box={500,300}
+
 
         love.graphics.setFont(love.graphics.newFont('fonts/slkscr.ttf',75))
 
         clicked_start=false
         selected=1
         squash=0
-        start_button_image = love.graphics.newImage("images/blue_button.png")
+        start_button_image = love.graphics.newImage("images/ui/blue_button.png")
         start_button={window_width/2-start_button_image:getWidth()/2,window_height/2+200}
         box_w=love.graphics.getWidth()/3
         box_x=window_width/2+box_w/2
@@ -95,7 +119,7 @@ function enter_state(index)
     elseif index=='game' then
         player:load()
     elseif index=='pull' then
-    
+        
     end
 end
 
@@ -124,7 +148,7 @@ function state_update(dt) -- stands for current state
             end
         end
         
-        --choose character
+        
         
 
 
@@ -154,8 +178,8 @@ function state_draw(dt)
         love.graphics.rectangle("fill",0,0,window_width,window_height/6)
         love.graphics.setColor(0.1,0.1,0.1, 1)
         love.graphics.rectangle("fill",0,window_height/6,window_width,10)
-
         --draws lines
+        
         love.graphics.rectangle("fill",line_left-5,0,10,window_height/6)
         love.graphics.rectangle("fill",line_right-5,0,10,window_height/6)
 
@@ -167,12 +191,24 @@ function state_draw(dt)
         love.graphics.rectangle("line",box_x,squash,box_w,window_height/6-squash*2,25,25,20)
         
         --text drawing
-        love.graphics.print( "config",50,window_height/6/2-35)
+        love.graphics.setFont(love.graphics.newFont('fonts/slkscr.ttf',60))
+        love.graphics.print( "config",70,window_height/6/2-35)
         love.graphics.print( "play",window_width/2-100,window_height/6/2-35)
         love.graphics.print( "shop",window_width/3*2+110,window_height/6/2-35)
 
         if selected==0 then
-        
+            --text
+            love.graphics.setFont(love.graphics.newFont('fonts/slkscr.ttf',50))
+            love.graphics.print( "fullscreen",50,300)
+
+            --draw box
+            love.graphics.setColor(1,1,1,1)
+            love.graphics.rectangle('fill',fullscreen_box[1],fullscreen_box[2],50,50)
+            love.graphics.setColor(0.1,0.1,0.1,1)
+            love.graphics.rectangle('line',fullscreen_box[1],fullscreen_box[2],50,50)
+            if full then
+                love.graphics.draw(check,fullscreen_box[1],fullscreen_box[2])
+            end
         elseif selected==1 then
             -- draw button
             love.graphics.setColor(1, 1, 1, 1)
@@ -181,6 +217,8 @@ function state_draw(dt)
             love.graphics.setFont(love.graphics.newFont('fonts/slkscr.ttf',60))
             love.graphics.print( "deploy",start_button[1]+25,start_button[2]+20)
             
+
+
             --draw character animation
             love.graphics.push()
             love.graphics.setColor(1,1,1,1)
@@ -202,9 +240,44 @@ function state_draw(dt)
                 love.graphics.setColor(1,1,1,1)
             end
             love.graphics.draw(left_arrow_image,window_width/2-window_width/6-left_arrow_image:getWidth(),window_height/2)
+     
+            --level upgrades
+
+            local pos = {window_width/4*3+20,window_height/5-50} 
+            love.graphics.setColor(1,1,1,1)
+            love.graphics.rectangle('fill',900,200,540,415,25,25,25)
+
+
+            
+            love.graphics.setColor(1,1,1,1)
+            --draw icons
+            for i=1,3 do
+                love.graphics.draw(circle_icon,pos[1]-70,pos[2]+(i*icons[1]:getHeight()*1.1)-10)
+                love.graphics.draw(icons[i],pos[1]-70,pos[2]+(i*icons[1]:getHeight()*1.1)-10)
+            end
+
+
+            --draw boxes
+            for i=1,3 do
+                for j=1,3 do
+                    love.graphics.draw(empty,pos[1]+(empty:getWidth()*1.5*j),pos[2]+(i*empty:getHeight()*1.3))
+                    if character_stats[tonumber(character_storage[menu_selected_character])][i]>=j then
+                        love.graphics.draw(full,pos[1]+(full:getWidth()*1.5*j),pos[2]+(i*full:getHeight()*1.3))
+                    end
+                end
+            end
+            
         
         elseif selected==2  then
-        
+            
+
+            love.graphics.setColor(0.1,0.1,0.1)
+            for i=0 ,5 do
+                love.graphics.rectangle('fill',buy_button.x-i,buy_button.y-i,buy_button.w+i*2,buy_button.h+i*2,25,25,30)
+            end
+            love.graphics.setColor(1,1,1)
+            love.graphics.rectangle('fill',buy_button.x,buy_button.y,buy_button.w,buy_button.h,25,25,30)
+  
         end
     elseif current_state=='game' then --game
         player:draw()
@@ -238,7 +311,9 @@ function mousepressed(x,y)
             squash=50
         end
         if selected==0 then
-        
+            if CheckCollision(mx,my,1,1,fullscreen_box[1],fullscreen_box[2],100,100) then
+                full = not full
+            end
         elseif selected==1 then
 
             -- start button collision
@@ -265,7 +340,9 @@ function mousepressed(x,y)
                 menu_selected_character = 1
             end
         elseif selected==2 then
-        
+            if CheckCollision(mx,my,1,1,buy_button.x,buy_button.y,buy_button.w,buy_button.h) then
+                switch_state('pull')
+            end
         end
     elseif current_state=='game' then
 
@@ -287,19 +364,26 @@ function CheckCollision(x1,y1,w1,h1, x2,y2,w2,h2)
   end
 
 function save_data()
-    local data=bitser.dumps(character_storage)
+    local t = {character_storage,character_stats}
+    local data=bitser.dumps(t)
     love.filesystem.write('save.sav',data)
 end
 
 function load_data()
     if love.filesystem.getInfo('save.sav') then
-        local string=love.filesystem.read('save.sav')
-        print(string)
-        character_storage=bitser.loads(string)
+        local string = love.filesystem.read('save.sav')
+        local loaded_data = bitser.loads(string)
+
+        character_storage = loaded_data[1]
+        character_stats = loaded_data[2]
     else
         character_storage={'1'}
+        character_stats={}
+        for i=1, 10 do
+            table.insert(character_stats,{3,2,1})
+        end
     end
-
+    
 end
 
 function love.quit()
