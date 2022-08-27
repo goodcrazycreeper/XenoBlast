@@ -11,7 +11,7 @@ end
 
 function transition:update(dt)
     if transition.on then
-        if self.size >= (love.graphics.getWidth()/2)*1.3 then
+        if self.size >= (window_width/2)*1.3 then
             if self.reached==false then
                 self.reached=true
                 switch_state(self.goal)
@@ -34,6 +34,6 @@ end
 function transition:draw()
     if transition.on then
         love.graphics.setColor(0,0,0,1)
-        love.graphics.circle("fill",love.graphics.getWidth()/2,love.graphics.getHeight()/2, self.size)
+        love.graphics.circle("fill",window_width/2,window_height/2, self.size)
     end
 end

@@ -69,8 +69,10 @@ function player:move(x,y,dt)
 end
 
 function player:draw()
+    love.graphics.push()
     love.graphics.setColor(1,1,1)
-    love.graphics.draw(self.Image, self.quads[self.sprite], self.x, self.y)
+    love.graphics.draw(self.Image, self.quads[self.sprite], self.x, self.y,0,-1,1)
+    love.graphics.pop()
 end
 
 function normalize(x,y)
