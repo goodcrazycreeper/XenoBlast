@@ -20,13 +20,25 @@ function player:load()
     self.particle_timer=0
     self.primary_reload=0
 
+    self.roll_timer=0
+    self.secondary_reload=0
+    self.roll_dx=0
+    self.roll_dy=0
+
     for i=0,3 do
 		table.insert(self.quads, love.graphics.newQuad(i * 48, 0,48 ,48 ,self.Image))
 	end
 end
 
 function player:update(dt)
+    self.roll_timer = self.roll_timer - dt
+    print(self.roll_timer)
+    if self.roll_timer >=0 then
+        
+        self:roll(dt)
+    end
     self.primary_reload = self.primary_reload - dt
+    self.secondary_reload = self.secondary_reload - dt
     self:animate(dt)
     self:input(dt)
     
@@ -120,7 +132,10 @@ function player_left_click()
 end
 
 function player_right_click()
-
+    if player.secondary_reload <= 0 then
+        player:init_roll()
+        player:set_secondary_reload()
+    end
 end
 
 
@@ -144,5 +159,42 @@ function player:set_primary_reload()
     elseif self.character==2 then
         self.primary_reload=0.3
     end
+
+end
+
+function player:set_secondary_reload()
+
+    if self.character==1 then
+        self.secondary_reload=0.5
+    elseif self.character==2 then
+        self.secondary_reload=0.6
+    end
+
+end
+
+function player:init_roll()
+    self.roll_timer=0.2
+    player:set_secondary_reload()
+end
+
+function player:roll(dt)
+
+    local vec={x=0,y=0}
+    if love.keyboard.isDown("w") then
+        vec.y = vec.y - 1
+    end
+    if love.keyboard.isDown("a") then
+        vec.x = vec.x - 1
+    end
+    if love.keyboard.isDown("s") then
+        vec.y = vec.y + 1
+    end
+    if love.keyboard.isDown("d") then
+        vec.x = vec.x + 1
+    end
+    vec.x,vec.y=normalize(vec.x,vec.y)
+    self.x = self.x + vec.x * 700 * dt
+    self.y = self.y + vec.y * 700 * dt
+
 
 end
