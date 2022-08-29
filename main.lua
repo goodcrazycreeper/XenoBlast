@@ -5,9 +5,10 @@ require('conf')
 require('enemy')
 require('state_update')
 require('state_draw')
-
+require('crosshair')
 
 require('lib/particles')
+require('projectiles')
 local bitser = require 'lib/bitser'
 flux = require 'lib/flux'
 
@@ -20,8 +21,12 @@ window_width = 1280
 window_height = 720
 full=false
 
+cam={100,0}
+
 
 function love.load()
+
+    
     selected=1
     selection_box={x=window_width/2-window_width/3/2,w=window_width/3}
     math.randomseed(os.time())
@@ -63,8 +68,13 @@ function love.draw()
     bg:draw()
     state_draw(current_state)
     transition:draw()
-    love.graphics.pop()
 
+
+
+    draw_crosshair()
+    love.graphics.pop()
+    love.graphics.setFont(love.graphics.newFont('fonts/slkscr.ttf',16))
+    love.graphics.print("Current FPS: "..tostring(love.timer.getFPS( )), 10, 10)
 end
 
 function switch_state(state)
@@ -82,7 +92,7 @@ function exit_state(index)
     
     elseif index=='pull' then
         selected=2
-        flux.to(selection_box, 0.4, { x = selected*window_width/3}):ease('elasticout')
+        flux.to(selection_box, 0.4, { x = selected*window_width/3}):ease('elasticout') 
     end
 end
 
@@ -94,6 +104,7 @@ function enter_state(index)
         love.graphics.setFont(love.graphics.newFont('fonts/slkscr.ttf',100))
         logo_image = love.graphics.newImage("images/ui/grape_pfp_pixel.png")
     elseif index=='menu' then
+        make_crosshair()
         rectangle_alpha=1
         character_info={
             {'Astro','Can do a dodge roll and has a \"pew pew\" gun.'},
@@ -162,12 +173,15 @@ function enter_state(index)
         line_left=window_width/3
         line_right=window_width/3*2
     elseif index=='game' then
+        floor_table = make_floor()
+        cam={100,0}
         enemy_quads=my_quads
         player:load()
         enemies={}
-        make_enemy(50)
-        make_enemy(50)
-        make_enemy(0)
+        for i=1,50 do
+            make_enemy(math.random(200),math.random(200))
+        end
+
     elseif index=='pull' then
         shine={alpha=0}
         shine_fx = love.graphics.newImage('images/ui/shine.png')
@@ -215,6 +229,9 @@ end
 function love.mousepressed(x, y, button, istouch)
     if button == 1 then
         mousepressed(x,y)
+    end
+    if button == 2 then
+        right_mousepressed(x,y)
     end
 end
 
@@ -286,11 +303,18 @@ function mousepressed(x,y)
             end
         end
     elseif current_state=='game' then
-
+        player_left_click()
+        
     elseif current_state=='pull' then
         if CheckCollision(mx,my,1,1,continue_button.x,continue_button.y,200,100) then
             switch_state('menu')
         end
+    end
+end
+
+function right_mousepressed(x,y)
+    if current_state=='game' then
+        player_right_click()
     end
 end
 
@@ -350,4 +374,37 @@ function pick_rarity()
         rarity = 1
     end
     return rarity
+end
+
+function make_floor()
+    desert_tiles={love.graphics.newImage('images/tiles/desert/1.png'),love.graphics.newImage('images/tiles/desert/2.png'),love.graphics.newImage('images/tiles/desert/3.png')}
+
+    floor_table = {}
+    for n = 1,1000 do
+        local t = {}
+        for i=1,1000 do
+            table.insert(t,math.random(1,3))
+        end
+        table.insert(floor_table,t)
+    end
+    return floor_table
+end
+
+function sign(input)
+    if input>0 then
+        return 1
+    elseif input<0 then
+        return -1
+    else
+        return 0
+    end
+    return 0
+end
+
+function should_rotate(input)
+    if input>-1.5 and input <1.5 then
+        return 1
+    else
+        return -1
+    end
 end

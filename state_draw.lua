@@ -121,16 +121,22 @@ function state_draw()
                 end
                 love.graphics.setColor(1,1,1)
                 love.graphics.rectangle('fill',buy_button.x,buy_button.y,buy_button.w,buy_button.h,25,25,30)
-    
             end
             love.graphics.setColor(0.6,0.5,0.6,rectangle_alpha)
             love.graphics.rectangle('fill',0,0,window_width,window_height)
 
 
     elseif current_state=='game' then --game
-        player:draw()
-        draw_enemies()
-        draw_particles()
+        love.graphics.push()
+            love.graphics.translate(-cam[1],-cam[2])
+            --draw_floor()
+            draw_particles()
+            player:draw()
+            draw_enemies()
+            
+            draw_projectiles()
+        love.graphics.pop()
+
     elseif current_state=='pull' then
         love.graphics.setBackgroundColor(pull_bg_color.r,pull_bg_color.g,pull_bg_color.b,1)
         
@@ -171,5 +177,18 @@ function state_draw()
         love.graphics.setFont(love.graphics.newFont('fonts/slkscr.ttf',30))
         love.graphics.printf('continue',continue_button.x,continue_button.y+35,200,'center')
 
+    end
+end
+
+function draw_floor()
+    for y=1,#floor_table do
+        for x=1,#floor_table[1] do
+            if (x*48+48)>cam[1] and (y*48+48)>cam[2]
+            and (x*48)<cam[1]+window_width and (y*48)<cam[2]+window_height  then
+                
+            
+            love.graphics.draw(desert_tiles[floor_table[y][x]],x*48,y*48)
+            end
+        end
     end
 end

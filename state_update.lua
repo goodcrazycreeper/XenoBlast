@@ -1,4 +1,6 @@
-function state_update(dt) -- stands for current state
+function state_update(dt)
+
+
     if current_state=='intro' then
         logo_x = lerp(logo_x,40,1*dt)
         intro_timer=intro_timer- 1*dt
@@ -24,8 +26,20 @@ function state_update(dt) -- stands for current state
         end
     
     elseif current_state=='game' then
+        local pcamx = player.x - window_width/2+24
+        local pcamy = player.y - window_height/2+24
+
+        local smx = mx + player.x - window_width/2+24
+        local smy = my + player.y - window_height/2+24
+
+        cam[1]= lerp(cam[1],pcamx,2*dt)
+        cam[2]= lerp(cam[2],pcamy,2*dt)
         player:update(dt)
         update_enemies()
+        update_particles()
+        update_projectiles()
+        check_projectile_collision()
+        check_enemy_collision()
         
     elseif current_state=='pull' then
         shine_rot = shine_rot +  dt
