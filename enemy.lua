@@ -75,8 +75,8 @@ function knockback(p,v)
 
     for i=1,10 do
         local rx,ry = normalize(-v.dx*100+math.random(-25,25),-v.dy*100+math.random(-25,25))
-        rx = rx * 5
-        ry = ry * 5
+        rx = rx * 500
+        ry = ry * 500
         make_particle(v.x,v.y,rx,ry,{0.9,0.9,0.9,1},0.2,5,0,0)
     end
     
@@ -89,8 +89,20 @@ function knockback(p,v)
 end
 
 function update_enemies()
-    for i=1, #enemies do
+    for i=#enemies,1,-1  do
         enemies[i]:update()
+        if enemies[i].hp <=0 then
+            for j=1,100 do
+                local dx = math.random(-10,10)
+                local dy = math.random(-10,10)
+                dx , dy = normalize(dx, dy)
+                dx = dx * 500
+                dy = dy * 500
+                --make_particle(x,y,dx,dy,color,life,size,da,ds)
+                make_particle(enemies[i].x+24,enemies[i].y+24,dx,dy,{1,0.3,0.3,1},0.5,10,-2,-20)
+            end
+            table.remove(enemies,i)
+        end
     end
 end
 

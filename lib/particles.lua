@@ -14,8 +14,8 @@ function make_particle(x,y,dx,dy,color,life,size,da,ds)
 
     update = function(self)
         
-        self.x = self.x + self.dx
-        self.y = self.y + self.dy
+        self.x = self.x + self.dx * global_dt
+        self.y = self.y + self.dy * global_dt
         self.life = self.life - global_dt
         self.size = self.size + ds * global_dt
         self.color[4] = self.color[4] + da * global_dt

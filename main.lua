@@ -178,7 +178,7 @@ function enter_state(index)
         enemy_quads=my_quads
         player:load()
         enemies={}
-        for i=1,50 do
+        for i=1,3 do
             make_enemy(math.random(200),math.random(200))
         end
 
@@ -383,7 +383,7 @@ function make_floor()
     for n = 1,1000 do
         local t = {}
         for i=1,1000 do
-            table.insert(t,math.random(1,3))
+            table.insert(t,1)
         end
         table.insert(floor_table,t)
     end

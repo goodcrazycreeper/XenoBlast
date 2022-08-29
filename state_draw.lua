@@ -129,7 +129,7 @@ function state_draw()
     elseif current_state=='game' then --game
         love.graphics.push()
             love.graphics.translate(-cam[1],-cam[2])
-            --draw_floor()
+            draw_floor()
             draw_particles()
             player:draw()
             draw_enemies()
@@ -183,11 +183,11 @@ end
 function draw_floor()
     for y=1,#floor_table do
         for x=1,#floor_table[1] do
-            if (x*48+48)>cam[1] and (y*48+48)>cam[2]
-            and (x*48)<cam[1]+window_width and (y*48)<cam[2]+window_height  then
+            if (x*200+200)>cam[1] and (y*200+200)>cam[2]
+            and (x*200)<cam[1]+window_width and (y*200)<cam[2]+window_height  then
                 
             
-            love.graphics.draw(desert_tiles[floor_table[y][x]],x*48,y*48)
+            love.graphics.draw(desert_tiles[floor_table[y][x]],x*200,y*200)
             end
         end
     end

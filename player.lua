@@ -140,7 +140,7 @@ end
 function player:set_primary_reload()
 
     if self.character==1 then
-        self.primary_reload=0.3
+        self.primary_reload=0.2
     elseif self.character==2 then
         self.primary_reload=0.3
     end
