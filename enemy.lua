@@ -19,12 +19,14 @@ function make_enemy(x,y,type)
     --offset={0,0},
     particle_timer=1,
     knockback_timer=0,
+    invincible=0,
 
     update = function(self)
 
         if self.first then
             self.first = false
         end
+        self.invincible = self.invincible - global_dt
         self.particle_timer = self.particle_timer - global_dt
         if self.particle_timer <=0 then
             self.particle_timer = 0.5
@@ -64,13 +66,6 @@ function make_enemy(x,y,type)
 end
 
 function knockback(p,v)
-    --(x,y,dx,dy,color,life,size,da,ds)
-
-    --[[
-    for i=1,math.random(5) do
-        make_particle(v.x+math.random(-10,10),v.y+math.random(-10,10),math.random(-100,100),math.random(-100,100),{0.6,0.6,0.6,0.3},1,25,0,-25)
-    end
-    --]]
     make_particle(v.x,v.y,0,0,{1,1,1,1},0.2,50,-2,-250)
 
     for i=1,10 do
@@ -79,14 +74,17 @@ function knockback(p,v)
         ry = ry * 500
         make_particle(v.x,v.y,rx,ry,{0.9,0.9,0.9,1},0.2,5,0,0)
     end
-    
-
-    
-
-
     p.x = p.x + v.dx * 10
     p.y = p.y + v.dy * 10
 end
+
+function melee_knockback(enemy,dx,dy)
+    make_particle(enemy.x,enemy.y,0,0,{1,1,1,1},0.2,50,-2,-250)
+
+    enemy.x = enemy.x + dx * 10
+    enemy.y = enemy.y + dy * 10
+end
+
 
 function update_enemies()
     for i=#enemies,1,-1  do
@@ -125,3 +123,4 @@ function check_enemy_collision()
         end
     end
 end
+

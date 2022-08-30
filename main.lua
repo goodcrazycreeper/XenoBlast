@@ -21,11 +21,24 @@ window_width = 1280
 window_height = 720
 full=false
 
+sounds={}
+sounds.menu_music = love.audio.newSource('sounds/menu_music.mp3', 'stream')
+sounds.menu_music:setLooping(true)
+sounds.laser_fire_sound = love.audio.newSource('sounds/laser.wav', 'static')
+sounds.select_sound = love.audio.newSource('sounds/select.wav', 'static')
+sounds.start_game_sound = love.audio.newSource('sounds/start_game.mp3', 'static')
+sounds.buzz = love.audio.newSource('sounds/buzz.mp3', 'static')
+
+--src1:setVolume(0.9) -- 90% of ordinary volume
+--src1:setPitch(0.5) -- one octave lower
+--src2:setVolume(0.7)
+
 cam={100,0}
 
 
 function love.load()
 
+sounds.menu_music:play()
     
     selected=1
     selection_box={x=window_width/2-window_width/3/2,w=window_width/3}
@@ -43,7 +56,7 @@ function love.load()
     end
     --]]
 
-    love.graphics.setDefaultFilter("nearest", "nearest")
+    love.graphics.setDefaultFilter('nearest', 'nearest')
     enter_state(current_state)
     config={}
     
@@ -74,7 +87,7 @@ function love.draw()
     draw_crosshair()
     love.graphics.pop()
     love.graphics.setFont(love.graphics.newFont('fonts/slkscr.ttf',16))
-    love.graphics.print("Current FPS: "..tostring(love.timer.getFPS( )), 10, 10)
+    love.graphics.print('Current FPS: '..tostring(love.timer.getFPS( )), 10, 10)
 end
 
 function switch_state(state)
@@ -102,12 +115,12 @@ function enter_state(index)
         intro_timer=5
         logo_x = 1500
         love.graphics.setFont(love.graphics.newFont('fonts/slkscr.ttf',100))
-        logo_image = love.graphics.newImage("images/ui/grape_pfp_pixel.png")
+        logo_image = love.graphics.newImage('images/ui/grape_pfp_pixel.png')
     elseif index=='menu' then
         make_crosshair()
         rectangle_alpha=1
         character_info={
-            {'Astro','Can do a dodge roll and has a \"pew pew\" gun.'},
+            {'Astro','Can do a dodge roll and has a \'pew pew\' gun.'},
             {'Pun Chi','Can realease a powerful punching barrage on enemies. Uses fists to fight.'},
             {'Nerd Ghost','Can Teleport anywhere on screen. Enemies near take damage. Throw various school related items that have different effects. (peirce, aoe, higher damage)'},
             {'Mancy','Can revive enemies into helpers with a necromancy ring. Shoots a dark orb projectile'},
@@ -143,7 +156,7 @@ function enter_state(index)
         --store character images
         my_character_images={}
         for i=1,8 do
-            table.insert(my_character_images,love.graphics.newImage("images/characters/character-"..tostring(i)..".png"))
+            table.insert(my_character_images,love.graphics.newImage('images/characters/character-'..tostring(i)..'.png'))
         end
 
         --store the quads for the images
@@ -163,7 +176,7 @@ function enter_state(index)
         
         
         squash=0
-        start_button_image = love.graphics.newImage("images/ui/blue_button.png")
+        start_button_image = love.graphics.newImage('images/ui/blue_button.png')
         start_button={window_width/2-start_button_image:getWidth()/2-100,window_height/2+200}
 
 
@@ -242,6 +255,8 @@ function mousepressed(x,y)
         if CheckCollision(mx,my,1,1,0,0,window_width/3,window_height/6) then
             if selected ~= 0 then
                 rectangle_alpha=darkness
+
+            sounds.select_sound:clone():play()
             end
             selected=0
             flux.to(selection_box, 0.4, { x = selected*window_width/3}):ease('elasticout')
@@ -251,6 +266,7 @@ function mousepressed(x,y)
         if CheckCollision(mx,my,1,1,window_width/3,0,window_width/3,window_height/6) then
             if selected ~= 1 then
                 rectangle_alpha=darkness
+                sounds.select_sound:clone():play()
             end
             selected=1
             flux.to(selection_box, 0.4, { x = selected*window_width/3}):ease('elasticout')
@@ -260,6 +276,7 @@ function mousepressed(x,y)
         if CheckCollision(mx,my,1,1,window_width/3*2,0,window_width/3,window_height/6) then
             if selected ~= 2 then
                 rectangle_alpha=darkness
+                sounds.select_sound:clone():play()
             end
 
             
@@ -277,16 +294,29 @@ function mousepressed(x,y)
 
             -- start button collision
             if CheckCollision(mx,my,1,1,start_button[1],start_button[2],start_button_image:getWidth(),start_button_image:getHeight()) then
+                sounds.start_game_sound:play()
                 transition:init('game')
             end
 
             --arrow bitton collisions
             if CheckCollision(mx,my,1,1,window_width/2+window_width/6-100,window_height/2,left_arrow_image:getWidth(),left_arrow_image:getHeight()) then 
                 menu_selected_character = menu_selected_character + 1
+                if menu_selected_character <#character_storage then
+                    sounds.select_sound:clone():play()
+                    --add tweening later
+                else
+                    sounds.buzz:clone():play()
+                end
             end
 
             if CheckCollision(mx,my,1,1,window_width/2-window_width/6-left_arrow_image:getWidth()-100,window_height/2,right_arrow_image:getWidth(),right_arrow_image:getWidth()) then 
                 menu_selected_character = menu_selected_character - 1
+                if menu_selected_character >0 then
+                    sounds.select_sound:clone():play()
+                    --add tweening later
+                else
+                    sounds.buzz:clone():play()
+                end
             end
 
             --clamps
@@ -299,6 +329,7 @@ function mousepressed(x,y)
             end
         elseif selected==2 then
             if CheckCollision(mx,my,1,1,buy_button.x,buy_button.y,buy_button.w,buy_button.h) then
+                sounds.select_sound:clone():play()
                 switch_state('pull')
             end
         end
@@ -407,4 +438,8 @@ function should_rotate(input)
     else
         return -1
     end
+end
+
+function game_menu()
+
 end

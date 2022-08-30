@@ -12,13 +12,17 @@ function player:load()
     self.walking=false
     self.character=menu_selected_character
     self.Image=love.graphics.newImage("images/characters/character-"..tostring(self.character)..".png")
-    self.weaponImage=love.graphics.newImage("images/weapons/"..tostring(self.character)..".png")
+    self.weaponImage=love.graphics.newImage("images/weapons/1.png")
     self.quads={}
     self.angle=0
     self.walk_timer=1
     self.scale_x=1
     self.particle_timer=0
     self.primary_reload=0
+
+    self.first=true
+
+    self.recoil=0
 
     self.roll_timer=0
     self.secondary_reload=0
@@ -31,11 +35,19 @@ function player:load()
 end
 
 function player:update(dt)
+    self.recoil = lerp(self.recoil,0,10*dt)
     self.roll_timer = self.roll_timer - dt
     print(self.roll_timer)
+    if self.first then
+        self.first=false
+        self:set_image()
+    end
+
     if self.roll_timer >=0 then
-        
         self:roll(dt)
+        self.invincible=true
+    else
+        self.invincible=false
     end
     self.primary_reload = self.primary_reload - dt
     self.secondary_reload = self.secondary_reload - dt
@@ -107,11 +119,11 @@ function player:draw()
         local delta_y = cam[2]+my-40 - self.y+24
         self.angle = math.atan2(delta_y, delta_x)
         if sign(self.angle)==-1 then
-            love.graphics.draw(self.weaponImage,self.x, self.y+30,   self.angle  ,1,should_rotate(self.angle),-15,9)
+            love.graphics.draw(self.weaponImage,self.x, self.y+30,   self.angle  ,1,should_rotate(self.angle),-15+self.recoil,9)
         end
         love.graphics.draw(self.Image, self.quads[self.sprite], self.x, self.y,0,self.scale_x,1,24,0)
         if sign(self.angle)==1 then
-            love.graphics.draw(self.weaponImage,self.x, self.y+30,   self.angle  ,1,should_rotate(self.angle),-15,9)
+            love.graphics.draw(self.weaponImage,self.x, self.y+30,   self.angle  ,1,should_rotate(self.angle),-15+self.recoil,9)
         end
         
         
@@ -120,21 +132,31 @@ end
 
 function player_left_click()
     if player.primary_reload <= 0 then
-        local delta_x = cam[1]+mx-40 - player.x
-        local delta_y = cam[2]+my-40 - player.y
+        local delta_x , delta_y = normalize(cam[1]+mx-40 - player.x,cam[2]+my-40 - player.y)
+        --local delta_x = cam[1]+mx-40 - player.x
+        --local delta_y = cam[2]+my-40 - player.y
+            
         if player.character == 1 then
+            player.recoil = 10
+            player.x = player.x - delta_x * 3
+            player.y = player.y - delta_y * 3
             make_projectile(player.x-24,player.y,delta_x,delta_y,1,1000)
             player:set_primary_reload()
         elseif player.character == 2 then
-    
+            player.x = player.x + delta_x * 6
+            player.y = player.y + delta_y * 6
+            player_melee(delta_x,delta_y,3)
         end
     end
 end
 
 function player_right_click()
+
     if player.secondary_reload <= 0 then
-        player:init_roll()
-        player:set_secondary_reload()
+        if player.character == 1 then
+            player:init_roll()
+            player:set_secondary_reload()
+        end
     end
 end
 
@@ -195,6 +217,39 @@ function player:roll(dt)
     vec.x,vec.y=normalize(vec.x,vec.y)
     self.x = self.x + vec.x * 700 * dt
     self.y = self.y + vec.y * 700 * dt
+end
 
+function player:set_image()
+    if self.character == 1 then
+        self.weaponImage=love.graphics.newImage("images/weapons/1.png")
+    elseif self.character == 2 then
+        self.weaponImage=love.graphics.newImage("images/weapons/none.png")
+    end
+end
+
+function player_melee(dx,dy)
+    local a = math.atan2(dy,dx)
+    a = a - 0.5
+    for o=1,10 do
+        local ax = math.cos(a)
+        local ay = math.sin(a)
+        for i,v in ipairs(enemies) do
+            for j= 1 , 10 do
+                --(x,y,dx,dy,color,life,size,da,ds)
+                make_particle(player.x+ax*j*10,player.y+24+ay*j*10,0,0,{1,1,1,1},2,5,0,0)
+                if CheckCollision(player.x+ax*j*10,player.y+24+ay*j*10,1,1,v.x-24,v.y,48,48) then
+                    if v.invincible <= 0 then
+                        v.hp = v.hp - 2
+                        melee_knockback(v,ax,ay)
+                        v.invincible = 0.1
+                    end
+
+                    
+                    
+                end
+            end
+        end
+        a = a + 0.1
+    end
 
 end
