@@ -9,17 +9,19 @@ function make_enemy(x,y,type)
     hp=10,
     walk_timer = 1,
     speed=50,
-    hp=10,
+    hp=4,
     sprite=1,
     type=type,
     first=true,
-    image=love.graphics.newImage('images/characters/character-6.png'),
+    image=love.graphics.newImage('images/characters/enemy-1.png'),
     dist={0,0},
     offset={math.random(-50,50),math.random(-50,50)},
     --offset={0,0},
     particle_timer=1,
     knockback_timer=0,
     invincible=0,
+    death_dx=0,
+    death_dy=0,
 
     update = function(self)
 
@@ -99,6 +101,7 @@ function update_enemies()
                 --make_particle(x,y,dx,dy,color,life,size,da,ds)
                 make_particle(enemies[i].x+24,enemies[i].y+24,dx,dy,{1,0.3,0.3,1},0.5,10,-2,-20)
             end
+            make_body_particle(enemies[i].x,enemies[i].y,enemies[i].death_dx,enemies[i].death_dy,'images/characters/dead_enemy-1.png')
             table.remove(enemies,i)
         end
     end

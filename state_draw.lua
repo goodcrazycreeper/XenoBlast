@@ -185,9 +185,7 @@ function draw_floor()
         for x=1,#floor_table[1] do
             if (x*200+200)>cam[1] and (y*200+200)>cam[2]
             and (x*200)<cam[1]+window_width and (y*200)<cam[2]+window_height  then
-                
-            
-            love.graphics.draw(desert_tiles[floor_table[y][x]],x*200,y*200)
+                love.graphics.draw(tiles[level],x*200,y*200)
             end
         end
     end

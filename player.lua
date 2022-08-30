@@ -35,9 +35,11 @@ function player:load()
 end
 
 function player:update(dt)
+
+
+
     self.recoil = lerp(self.recoil,0,10*dt)
     self.roll_timer = self.roll_timer - dt
-    print(self.roll_timer)
     if self.first then
         self.first=false
         self:set_image()
@@ -53,7 +55,8 @@ function player:update(dt)
     self.secondary_reload = self.secondary_reload - dt
     self:animate(dt)
     self:input(dt)
-    
+    self.x = math.clamp(224, self.x, 200*9-24)
+    self.y = math.clamp(224, self.y, 200*9-48)
 end
 
 function player:animate(dt)
@@ -239,7 +242,9 @@ function player_melee(dx,dy)
                 make_particle(player.x+ax*j*10,player.y+24+ay*j*10,0,0,{1,1,1,1},2,5,0,0)
                 if CheckCollision(player.x+ax*j*10,player.y+24+ay*j*10,1,1,v.x-24,v.y,48,48) then
                     if v.invincible <= 0 then
+                        v.death_dx,v.death_dy=ax,ay
                         v.hp = v.hp - 2
+                        
                         melee_knockback(v,ax,ay)
                         v.invincible = 0.1
                     end

@@ -38,17 +38,14 @@ cam={100,0}
 
 function love.load()
 
-sounds.menu_music:play()
-    
+    sounds.menu_music:play()
+    load_data()
     selected=1
     selection_box={x=window_width/2-window_width/3/2,w=window_width/3}
     math.randomseed(os.time())
-    for i=1 , 30 do
-        print(pick_rarity())
-    end
-
+    
     love.mouse.setVisible(true)
-    load_data()
+    
 
     --[[
     for i=2, 8 do 
@@ -87,7 +84,7 @@ function love.draw()
     draw_crosshair()
     love.graphics.pop()
     love.graphics.setFont(love.graphics.newFont('fonts/slkscr.ttf',16))
-    love.graphics.print('Current FPS: '..tostring(love.timer.getFPS( )), 10, 10)
+    love.graphics.print('Current FPS: '..tostring(love.timer.getFPS()), 10, 10)
 end
 
 function switch_state(state)
@@ -118,6 +115,7 @@ function enter_state(index)
         logo_image = love.graphics.newImage('images/ui/grape_pfp_pixel.png')
     elseif index=='menu' then
         make_crosshair()
+        level = 2
         rectangle_alpha=1
         character_info={
             {'Astro','Can do a dodge roll and has a \'pew pew\' gun.'},
@@ -186,13 +184,14 @@ function enter_state(index)
         line_left=window_width/3
         line_right=window_width/3*2
     elseif index=='game' then
+        love.graphics.setBackgroundColor(0,0,0,1)
         floor_table = make_floor()
         cam={100,0}
         enemy_quads=my_quads
         player:load()
         enemies={}
-        for i=1,3 do
-            make_enemy(math.random(200),math.random(200))
+        for i=1,100 do
+            make_enemy(math.random(1000),math.random(1000))
         end
 
     elseif index=='pull' then
@@ -408,12 +407,12 @@ function pick_rarity()
 end
 
 function make_floor()
-    desert_tiles={love.graphics.newImage('images/tiles/desert/1.png'),love.graphics.newImage('images/tiles/desert/2.png'),love.graphics.newImage('images/tiles/desert/3.png')}
+    tiles={love.graphics.newImage('images/tiles/1.png'),love.graphics.newImage('images/tiles/2.png'),love.graphics.newImage('images/tiles/3.png')}
 
     floor_table = {}
-    for n = 1,1000 do
+    for n = 1,8 do
         local t = {}
-        for i=1,1000 do
+        for i=1,8 do
             table.insert(t,1)
         end
         table.insert(floor_table,t)
@@ -443,3 +442,5 @@ end
 function game_menu()
 
 end
+
+function math.clamp(low, n, high) return math.min(math.max(n, low), high) end
