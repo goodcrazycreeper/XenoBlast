@@ -1,5 +1,6 @@
 particles={}
 body_particle={}
+spawn_particle={}
 function make_particle(x,y,dx,dy,color,life,size,da,ds)
     local particle = {
 
@@ -63,7 +64,6 @@ function make_body_particle(x,y,dx,dy,image)
             self.y = self.y + self.dy * global_dt * 200
             --self.x = self.x + 10 * global_dt
             --self.y = self.y + 10 * global_dt
-            print(self.frame)
         end,
     
         draw = function(self)
@@ -72,11 +72,44 @@ function make_body_particle(x,y,dx,dy,image)
         end
         }
     
-        table.insert(body_particle,particle)
+        table.insert(body_particle,particle) 
+end
+
+function make_spawner_particle(x,y,type)
+    local spawner = {
+
+        x = x,
+        y = y,
+        type=type,
+        first = true,
+        life=10,
     
+        update = function(self)
+            if self.first then
+                self.first = false
+                flux.to(self,1,{life=0}):ease('elasticout'):delay(1)
+            end
+        end,
+    
+        draw = function(self)
+            love.graphics.setColor(1,0.6,0.6,1)
+            love.graphics.circle('fill',self.x+24,self.y+24,self.life*2+3)
+            love.graphics.setColor(1,0.3,0.3,1)
+            love.graphics.circle('fill',self.x+24,self.y+24,self.life*2)
+        end
+        }
+    
+        table.insert(spawn_particle,spawner) 
 end
 
 function update_particles()
+    for i,v in ipairs(spawn_particle) do
+        v:update()
+        if v.life<=0 then
+            make_enemy(v.x,v.y,v.type)
+            table.remove(spawn_particle,i)
+        end
+    end
     for i,v in ipairs(body_particle) do
         v:update()
         if v.life<=0 then
@@ -94,6 +127,9 @@ end
 
 function draw_particles()
     for i,v in ipairs(body_particle) do
+        v:draw()
+    end
+    for i,v in ipairs(spawn_particle) do
         v:draw()
     end
     for i,v in ipairs(particles) do

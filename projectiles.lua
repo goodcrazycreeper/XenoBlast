@@ -75,6 +75,7 @@ function check_projectile_collision()
             if CheckCollision(v.x,v.y,10,10,p.x,p.y,48,48) then
                 p.death_dx,p.death_dy=v.dx,v.dy
                 p.hp = p.hp - v.damage
+                p.invincible = 0.1
                 knockback(p,v)
                 table.insert(t,i)
             end

@@ -165,7 +165,8 @@ function enter_state(index)
         
         --config variables
         check = love.graphics.newImage('images/ui/check.png')
-        fullscreen_box={500,300}
+
+        config_ui={fullscreen_box={x=500,y=200}}
 
 
         love.graphics.setFont(love.graphics.newFont('fonts/slkscr.ttf',75))
@@ -190,8 +191,8 @@ function enter_state(index)
         enemy_quads=my_quads
         player:load()
         enemies={}
-        for i=1,100 do
-            make_enemy(math.random(1000),math.random(1000))
+        for i=1,50 do
+            make_spawner_particle(math.random(1000),math.random(1000),1)
         end
 
     elseif index=='pull' then
@@ -286,8 +287,9 @@ function mousepressed(x,y)
 
         end
         if selected==0 then
-            if CheckCollision(mx,my,1,1,fullscreen_box[1],fullscreen_box[2],100,100) then
-                full = not full
+            if CheckCollision(mx,my,1,1,config_ui.fullscreen_box.x,config_ui.fullscreen_box.y,60,60) then
+                config_storage.full = not config_storage.full
+                love.window.setFullscreen(config_storage.full)
             end
         elseif selected==1 then
 
@@ -361,7 +363,7 @@ function CheckCollision(x1,y1,w1,h1,x2,y2,w2,h2)
   end
 
 function save_data()
-    local t = {character_storage,character_stats}
+    local t = {character_storage,character_stats,config_storage}
     local data=bitser.dumps(t)
     love.filesystem.write('save.sav',data)
 end
@@ -373,9 +375,13 @@ function load_data()
 
         character_storage = loaded_data[1]
         character_stats = loaded_data[2]
+        config_storage = loaded_data[3]
+        
+        love.window.setFullscreen(config_storage.full)
     else
         character_storage={'1'}
         character_stats={}
+        config_storage={full=false,master=100,music=100,sfx=100}
         for i=1, 10 do
             table.insert(character_stats,{0,0,0})
         end

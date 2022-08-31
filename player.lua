@@ -135,7 +135,7 @@ end
 
 function player_left_click()
     if player.primary_reload <= 0 then
-        local delta_x , delta_y = normalize(cam[1]+mx-40 - player.x,cam[2]+my-40 - player.y)
+        local delta_x , delta_y = normalize(cam[1]+mx - 0 - player.x,cam[2]+my - 20 - player.y)
         --local delta_x = cam[1]+mx-40 - player.x
         --local delta_y = cam[2]+my-40 - player.y
             
@@ -144,6 +144,9 @@ function player_left_click()
             player.x = player.x - delta_x * 3
             player.y = player.y - delta_y * 3
             make_projectile(player.x-24,player.y,delta_x,delta_y,1,1000)
+            local s = sounds.laser_fire_sound:clone()
+            s:setPitch(1+math.random(-2,2)/10)
+            s:play()
             player:set_primary_reload()
         elseif player.character == 2 then
             player.x = player.x + delta_x * 6
@@ -246,7 +249,7 @@ function player_melee(dx,dy)
                         v.hp = v.hp - 2
                         
                         melee_knockback(v,ax,ay)
-                        v.invincible = 0.1
+                        v.invincible = 0.2
                     end
 
                     

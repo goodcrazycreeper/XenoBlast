@@ -39,6 +39,14 @@ function state_draw()
             love.graphics.setFont(love.graphics.newFont('fonts/slkscr.ttf',60))
 
             love.graphics.print("fullscreen\n\nmaster volume\nmusic volume\nsfx volume",20,200)
+
+            
+            love.graphics.rectangle('fill',config_ui.fullscreen_box.x,config_ui.fullscreen_box.y,60,60)
+
+            if config_storage.full then
+                love.graphics.setColor(0.9, 0.9, 0.9, 0.9)
+                love.graphics.rectangle('fill',config_ui.fullscreen_box.x+10,config_ui.fullscreen_box.y+10,40,40)
+            end
         elseif selected==1 then
             -- draw button
             love.graphics.setColor(1, 1, 1, 1)

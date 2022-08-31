@@ -13,7 +13,8 @@ function make_enemy(x,y,type)
     sprite=1,
     type=type,
     first=true,
-    image=love.graphics.newImage('images/characters/enemy-1.png'),
+    image=love.graphics.newImage('images/characters/enemy-'..tostring(type)..'.png'),
+    death_image = love.graphics.newImage('images/characters/dead-enemy-'..tostring(type)..'.png'),
     dist={0,0},
     offset={math.random(-50,50),math.random(-50,50)},
     --offset={0,0},
@@ -58,7 +59,11 @@ function make_enemy(x,y,type)
 
     draw = function(self)
         love.graphics.setColor(1,1,1)
-        love.graphics.draw(self.image, self.quads[self.sprite], self.x, self.y)
+        if self.invincible >= 0 then
+            love.graphics.draw(self.death_image, self.quads[1], self.x, self.y)
+        else
+            love.graphics.draw(self.image, self.quads[self.sprite], self.x, self.y)
+        end
     end
     }
 
@@ -101,7 +106,7 @@ function update_enemies()
                 --make_particle(x,y,dx,dy,color,life,size,da,ds)
                 make_particle(enemies[i].x+24,enemies[i].y+24,dx,dy,{1,0.3,0.3,1},0.5,10,-2,-20)
             end
-            make_body_particle(enemies[i].x,enemies[i].y,enemies[i].death_dx,enemies[i].death_dy,'images/characters/dead_enemy-1.png')
+            make_body_particle(enemies[i].x,enemies[i].y,enemies[i].death_dx,enemies[i].death_dy,'images/characters/dead-enemy-'..enemies[i].type..'.png')
             table.remove(enemies,i)
         end
     end
