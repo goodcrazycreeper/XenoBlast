@@ -6,7 +6,7 @@ require('enemy')
 require('state_update')
 require('state_draw')
 require('crosshair')
-
+require('game_loop')
 require('lib/particles')
 require('projectiles')
 local bitser = require 'lib/bitser'
@@ -37,7 +37,7 @@ cam={100,0}
 
 
 function love.load()
-
+    
     sounds.menu_music:play()
     load_data()
     selected=1
@@ -185,6 +185,8 @@ function enter_state(index)
         line_left=window_width/3
         line_right=window_width/3*2
     elseif index=='game' then
+        make_walls()
+        start_game()
         love.graphics.setBackgroundColor(0,0,0,1)
         floor_table = make_floor()
         cam={100,0}
@@ -192,7 +194,7 @@ function enter_state(index)
         player:load()
         enemies={}
         for i=1,50 do
-            make_spawner_particle(math.random(1000),math.random(1000),1)
+            
         end
 
     elseif index=='pull' then
@@ -426,6 +428,23 @@ function make_floor()
     return floor_table
 end
 
+function make_walls()
+    local wall_table = {
+        {{1,0,0,0,0,0,0,0,0,0},
+        {0,1,0,0,0,0,0,0,0,0},
+        {0,0,1,0,0,0,0,0,0,0},
+        {0,0,0,1,0,0,0,0,0,0},
+        {0,0,0,0,1,0,0,0,0,0},
+        {0,0,0,0,0,1,0,0,0,0},
+        {0,0,0,0,0,0,1,0,0,0},
+        {0,0,0,0,0,0,0,1,0,0},
+        {0,0,0,0,0,0,0,0,0,0},
+        {0,0,0,0,0,0,0,0,0,0}}
+    }
+    walls = wall_table[1]
+end
+
+
 function sign(input)
     if input>0 then
         return 1
@@ -443,10 +462,6 @@ function should_rotate(input)
     else
         return -1
     end
-end
-
-function game_menu()
-
 end
 
 function math.clamp(low, n, high) return math.min(math.max(n, low), high) end

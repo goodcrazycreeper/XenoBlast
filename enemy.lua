@@ -28,6 +28,13 @@ function make_enemy(x,y,type)
 
         if self.first then
             self.first = false
+            if self.type==1 then
+                self.hp = 4
+                self.speed = 50
+            elseif self.type==2 then
+                self.hp = 1
+                self.speed = 150
+            end
         end
         self.invincible = self.invincible - global_dt
         self.particle_timer = self.particle_timer - global_dt
@@ -55,6 +62,8 @@ function make_enemy(x,y,type)
         end
         self.x = self.x - self.dist.x * self.speed * global_dt
         self.y = self.y - self.dist.y * self.speed * global_dt
+        self.x = math.clamp(200, self.x, 200*9-24)
+        self.y = math.clamp(200, self.y, 200*9-48)
     end,
 
     draw = function(self)
@@ -86,7 +95,7 @@ function knockback(p,v)
 end
 
 function melee_knockback(enemy,dx,dy)
-    make_particle(enemy.x,enemy.y,0,0,{1,1,1,1},0.2,50,-2,-250)
+    make_particle(enemy.x+24,enemy.y+24,0,0,{1,1,1,1},0.2,50,-2,-250)
 
     enemy.x = enemy.x + dx * 10
     enemy.y = enemy.y + dy * 10

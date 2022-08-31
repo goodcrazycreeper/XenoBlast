@@ -40,6 +40,8 @@ function state_update(dt)
         update_projectiles()
         check_projectile_collision()
         check_enemy_collision()
+        update_spawn()
+        --enemy_path()
         
     elseif current_state=='pull' then
         shine_rot = shine_rot +  dt
