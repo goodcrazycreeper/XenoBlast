@@ -141,11 +141,19 @@ function state_draw()
             draw_floor()
             --draw_walls()
             draw_particles()
+
+            --draw back of ship
+            love.graphics.setColor(1,1,1,1)
+            love.graphics.draw(love.graphics.newImage('images/ship_back.png') ,ship.x+34,ship.y+38)
+            
             player:draw()
             draw_enemies()
             
             draw_projectiles()
+            ship:draw()
+            
         love.graphics.pop()
+        game_ui()
 
     elseif current_state=='pull' then
         love.graphics.setBackgroundColor(pull_bg_color.r,pull_bg_color.g,pull_bg_color.b,1)

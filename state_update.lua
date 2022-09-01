@@ -41,6 +41,9 @@ function state_update(dt)
         check_projectile_collision()
         check_enemy_collision()
         update_spawn()
+        update_game()
+        ship:update()
+
         --enemy_path()
         
     elseif current_state=='pull' then

@@ -99,7 +99,9 @@ function exit_state(index)
     elseif index=='menu' then
         bg:stop()
     elseif index=='game' then
-    
+        ship.x=-1000
+        ship.y=-1000
+        ship.inside=false
     elseif index=='pull' then
         selected=2
         flux.to(selection_box, 0.4, { x = selected*window_width/3}):ease('elasticout') 
@@ -115,7 +117,7 @@ function enter_state(index)
         logo_image = love.graphics.newImage('images/ui/grape_pfp_pixel.png')
     elseif index=='menu' then
         make_crosshair()
-        level = 2
+        level = 1
         rectangle_alpha=1
         character_info={
             {'Astro','Can do a dodge roll and has a \'pew pew\' gun.'},
@@ -193,9 +195,7 @@ function enter_state(index)
         enemy_quads=my_quads
         player:load()
         enemies={}
-        for i=1,50 do
-            
-        end
+        spawn_timer=0
 
     elseif index=='pull' then
         shine={alpha=0}
