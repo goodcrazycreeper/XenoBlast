@@ -136,9 +136,13 @@ function state_draw()
 
     elseif current_state=='game' then --game
         love.graphics.push()
-            
-            love.graphics.translate(-cam[1],-cam[2])
+        love.graphics.translate(-cam[1],-cam[2])
             draw_floor()
+            love.graphics.setColor(1,1,1,0.5)
+            for i,v in ipairs(enemies) do
+                love.graphics.draw(shadow_image,v.x,v.y+40)
+            end
+            love.graphics.draw(shadow_image,player.x-shadow_image:getWidth()/2,player.y+40)
             --draw_walls()
             draw_particles()
 

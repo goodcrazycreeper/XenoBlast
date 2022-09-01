@@ -102,6 +102,7 @@ function exit_state(index)
         ship.x=-1000
         ship.y=-1000
         ship.inside=false
+        level = level + 1
     elseif index=='pull' then
         selected=2
         flux.to(selection_box, 0.4, { x = selected*window_width/3}):ease('elasticout') 
@@ -187,6 +188,7 @@ function enter_state(index)
         line_left=window_width/3
         line_right=window_width/3*2
     elseif index=='game' then
+        shadow_image=love.graphics.newImage('images/shadow.png')
         make_walls()
         start_game()
         love.graphics.setBackgroundColor(0,0,0,1)
