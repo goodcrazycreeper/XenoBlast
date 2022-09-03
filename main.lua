@@ -31,7 +31,7 @@ sounds.buzz = love.audio.newSource('sounds/buzz.mp3', 'static')
 
 --src1:setVolume(0.9) -- 90% of ordinary volume
 --src1:setPitch(0.5) -- one octave lower
---src2:setVolume(0.7)
+
 
 cam={100,0}
 
@@ -103,6 +103,7 @@ function exit_state(index)
         ship.y=-1000
         ship.inside=false
         level = level + 1
+        body_particle={}
     elseif index=='pull' then
         selected=2
         flux.to(selection_box, 0.4, { x = selected*window_width/3}):ease('elasticout') 
@@ -189,7 +190,6 @@ function enter_state(index)
         line_right=window_width/3*2
     elseif index=='game' then
         shadow_image=love.graphics.newImage('images/shadow.png')
-        make_walls()
         start_game()
         love.graphics.setBackgroundColor(0,0,0,1)
         floor_table = make_floor()
@@ -291,10 +291,14 @@ function mousepressed(x,y)
 
         end
         if selected==0 then
+
+            --fullscreen code
             if CheckCollision(mx,my,1,1,config_ui.fullscreen_box.x,config_ui.fullscreen_box.y,60,60) then
                 config_storage.full = not config_storage.full
                 love.window.setFullscreen(config_storage.full)
             end
+            --sound code
+            change_volume()
         elseif selected==1 then
 
             -- start button collision
@@ -380,6 +384,11 @@ function load_data()
         character_storage = loaded_data[1]
         character_stats = loaded_data[2]
         config_storage = loaded_data[3]
+
+        for i,v in ipairs(sounds) do
+            v:setVolume((config_storage.sfx/100)*(config_storage.master/100))
+        end
+        sounds.menu_music:setVolume((config_storage.music/100)*(config_storage.master/100))
         
         love.window.setFullscreen(config_storage.full)
     else
@@ -388,6 +397,9 @@ function load_data()
         config_storage={full=false,master=100,music=100,sfx=100}
         for i=1, 10 do
             table.insert(character_stats,{0,0,0})
+        end
+        for i,v in ipairs(sounds) do
+            v:setVolume(1)
         end
     end
 end
@@ -430,22 +442,6 @@ function make_floor()
     return floor_table
 end
 
-function make_walls()
-    local wall_table = {
-        {{1,0,0,0,0,0,0,0,0,0},
-        {0,1,0,0,0,0,0,0,0,0},
-        {0,0,1,0,0,0,0,0,0,0},
-        {0,0,0,1,0,0,0,0,0,0},
-        {0,0,0,0,1,0,0,0,0,0},
-        {0,0,0,0,0,1,0,0,0,0},
-        {0,0,0,0,0,0,1,0,0,0},
-        {0,0,0,0,0,0,0,1,0,0},
-        {0,0,0,0,0,0,0,0,0,0},
-        {0,0,0,0,0,0,0,0,0,0}}
-    }
-    walls = wall_table[1]
-end
-
 
 function sign(input)
     if input>0 then
@@ -467,3 +463,54 @@ function should_rotate(input)
 end
 
 function math.clamp(low, n, high) return math.min(math.max(n, low), high) end
+
+
+
+function draw_sound_menu()
+    love.graphics.setColor(1,1,1,1)
+    love.graphics.draw(left_arrow_image,600,325)
+    love.graphics.printf(tostring(config_storage.master),600,320,200+left_arrow_image:getWidth(),'center')
+    love.graphics.draw(right_arrow_image,800,325)
+
+    love.graphics.draw(left_arrow_image,600,385)
+    love.graphics.printf(tostring(config_storage.music),600,380,200+left_arrow_image:getWidth(),'center')
+    love.graphics.draw(right_arrow_image,800,385)
+
+    love.graphics.draw(left_arrow_image,600,445)
+    love.graphics.printf(tostring(config_storage.sfx),600,440,200+left_arrow_image:getWidth(),'center')
+    love.graphics.draw(right_arrow_image,800,445)
+end
+
+function change_volume()
+    local width = left_arrow_image:getWidth()
+    local height = left_arrow_image:getHeight()
+    --master
+    if CheckCollision(mx,my,1,1,600,325,width,height) then
+        config_storage.master = config_storage.master - 10
+    end
+    if CheckCollision(mx,my,1,1,800,325,width,height) then
+        config_storage.master = config_storage.master + 10
+    end
+    --music
+    if CheckCollision(mx,my,1,1,600,385,width,height) then
+        config_storage.music = config_storage.music - 10
+    end
+    if CheckCollision(mx,my,1,1,800,385,width,height) then
+        config_storage.music = config_storage.music + 10
+    end
+    --sfx
+    if CheckCollision(mx,my,1,1,600,445,width,height) then
+        config_storage.sfx = config_storage.sfx - 10
+    end
+    if CheckCollision(mx,my,1,1,800,445,width,height) then
+        config_storage.sfx = config_storage.sfx + 10
+    end
+    config_storage.master = math.clamp(0, config_storage.master, 100)
+    config_storage.music = math.clamp(0, config_storage.music, 100) 
+    config_storage.sfx = math.clamp(0, config_storage.sfx, 100) 
+
+    for i,v in ipairs(sounds) do
+        v:setVolume((config_storage.sfx/100)*(config_storage.master/100))
+    end
+    sounds.menu_music:setVolume((config_storage.music/100)*(config_storage.master/100))
+end

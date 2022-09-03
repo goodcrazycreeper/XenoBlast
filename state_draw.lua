@@ -47,6 +47,9 @@ function state_draw()
                 love.graphics.setColor(0.9, 0.9, 0.9, 0.9)
                 love.graphics.rectangle('fill',config_ui.fullscreen_box.x+10,config_ui.fullscreen_box.y+10,40,40)
             end
+
+            draw_sound_menu()
+            
         elseif selected==1 then
             -- draw button
             love.graphics.setColor(1, 1, 1, 1)

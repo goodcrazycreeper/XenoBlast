@@ -23,19 +23,33 @@ function make_enemy(x,y,type)
     invincible=0,
     death_dx=0,
     death_dy=0,
+    damage=1,
+    projectile_timer=0,
 
     update = function(self)
-
+        
         if self.first then
             self.first = false
             if self.type==1 then
                 self.hp = 4
-                self.speed = 50
+                self.speed = 75
+                self.damage=2
             elseif self.type==2 then
                 self.hp = 1
                 self.speed = 150
+                self.damage=3
+            elseif self.type==3 then
+                self.hp = 10
+                self.speed = 40
+                self.damage=5
+            elseif self.type==4 then
+                self.hp = 5
+                self.speed = 100
+                self.damage=3
             end
         end
+
+
         self.invincible = self.invincible - global_dt
         self.particle_timer = self.particle_timer - global_dt
         if self.particle_timer <=0 then
@@ -62,6 +76,16 @@ function make_enemy(x,y,type)
         end
         self.x = self.x - self.dist.x * self.speed * global_dt
         self.y = self.y - self.dist.y * self.speed * global_dt
+
+        if self.type==4 then
+            self.projectile_timer = self.projectile_timer - global_dt
+            if self.projectile_timer <=0 then
+                self.projectile_timer=math.random(2,3)
+                --make_projectile(x,y,dx,dy,type,speed)
+                make_projectile(self.x,self.y-5,-self.dist.x,-self.dist.y,2,500)
+            end
+        end
+
         self.x = math.clamp(200, self.x, 200*9-24)
         self.y = math.clamp(200, self.y, 200*9-48)
     end,

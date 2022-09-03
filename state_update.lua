@@ -24,7 +24,7 @@ function state_update(dt)
                 character_frame = 1
             end
         end
-    
+
     elseif current_state=='game' then
         local pcamx = player.x - window_width/2+24
         local pcamy = player.y - window_height/2+24

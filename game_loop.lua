@@ -8,6 +8,7 @@ function start_game()
 
     enemy_list = {}
     starting_enemies = math.random(40,50)
+    starting_enemies = 2
     for i=0 , starting_enemies do
         local rnd = math.random(4)
         if rnd == 1 then
@@ -31,7 +32,6 @@ function update_spawn()
     if #enemies == 0 and #enemy_list == 1 and not ship_dropped and begin_timer <= 0 then
         ship_dropped = true
         ship:make()
-        print('made_ship!')
     end
 end
 
