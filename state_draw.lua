@@ -139,7 +139,7 @@ function state_draw()
 
     elseif current_state=='game' then --game
         love.graphics.push()
-        love.graphics.translate(-cam[1],-cam[2])
+        love.graphics.translate(-cam[1]+shake[1],-cam[2]+shake[2])
             draw_floor()
             love.graphics.setColor(1,1,1,0.5)
             for i,v in ipairs(enemies) do
@@ -157,6 +157,7 @@ function state_draw()
             draw_enemies()
             
             draw_projectiles()
+            draw_line()
             ship:draw()
             
         love.graphics.pop()
@@ -226,5 +227,38 @@ function draw_walls()
                 love.graphics.draw(tiles[1],x*200,y*200)
             end
         end
+    end
+end
+
+function make_line() 
+    line_table={}
+    for x=2,18 do
+        table.insert(line_table,x*100)
+        table.insert(line_table,200)
+    end
+    for y=2,18 do
+        table.insert(line_table,1800)
+        table.insert(line_table,y*100)
+    end
+    for x=18,2,-1 do
+        table.insert(line_table,x*100)
+        table.insert(line_table,1800)
+    end
+    for y=18,2,-1 do
+        table.insert(line_table,200)
+        table.insert(line_table,y*100)
+    end
+
+end
+
+function draw_line()
+    love.graphics.setColor(0.3,0.3,0.3)
+    local line_table_clone = {}
+    local rumble = 5
+    for n=1,5 do
+        for i=1, #line_table do
+            table.insert(line_table_clone,line_table[i]+math.random(-rumble,rumble))
+        end
+        love.graphics.line(line_table_clone)
     end
 end

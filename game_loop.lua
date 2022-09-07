@@ -8,7 +8,7 @@ function start_game()
 
     enemy_list = {}
     starting_enemies = math.random(40,50)
-    starting_enemies = 2
+    starting_enemies= 2
     for i=0 , starting_enemies do
         local rnd = math.random(4)
         if rnd == 1 then
@@ -23,7 +23,7 @@ function update_spawn()
     begin_timer = begin_timer - global_dt
     spawn_timer = spawn_timer - global_dt
     if spawn_timer <=0 then
-        spawn_timer = 0.3 + math.random(5)/10
+        spawn_timer = 0.15 + math.random(5)/10
         if  #enemy_list>1 then
             make_spawner_particle(math.random(100,1600),math.random(100,1600),enemy_list[#enemy_list-1])
             table.remove(enemy_list,#enemy_list-1)

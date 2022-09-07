@@ -26,6 +26,7 @@ function state_update(dt)
         end
 
     elseif current_state=='game' then
+        update_shake(dt)
         local pcamx = player.x - window_width/2+24
         local pcamy = player.y - window_height/2+24
 

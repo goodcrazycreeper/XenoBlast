@@ -11,14 +11,16 @@ function player:load()
     self.hp=10
     self.walking=false
     self.character=menu_selected_character
-    self.Image=love.graphics.newImage("images/characters/character-"..tostring(self.character)..".png")
-    self.weaponImage=love.graphics.newImage("images/weapons/1.png")
+    self.image=love.graphics.newImage("images/characters/players/character-"..tostring(self.character)..".png")
+    self.dead_image=love.graphics.newImage("images/characters/players/character-"..tostring(self.character).."-dead.png")
+    self.weapon_image=love.graphics.newImage("images/weapons/1.png")
     self.quads={}
     self.angle=0
     self.walk_timer=1
     self.scale_x=1
     self.particle_timer=0
     self.primary_reload=0
+    self.invincible = 0
 
     self.first=true
 
@@ -30,14 +32,14 @@ function player:load()
     self.roll_dy=0
 
     for i=0,3 do
-		table.insert(self.quads, love.graphics.newQuad(i * 48, 0,48 ,48 ,self.Image))
+		table.insert(self.quads, love.graphics.newQuad(i * 48, 0,48 ,48 ,self.image))
 	end
 end
 
 function player:update(dt)
 
 
-
+    self.invincible = self.invincible - dt
     self.recoil = lerp(self.recoil,0,10*dt)
     self.roll_timer = self.roll_timer - dt
     if self.first then
@@ -47,9 +49,6 @@ function player:update(dt)
 
     if self.roll_timer >=0 then
         self:roll(dt)
-        self.invincible=true
-    else
-        self.invincible=false
     end
     self.primary_reload = self.primary_reload - dt
     self.secondary_reload = self.secondary_reload - dt
@@ -57,6 +56,11 @@ function player:update(dt)
     self:input(dt)
     self.x = math.clamp(200, self.x, 200*9-24)
     self.y = math.clamp(200, self.y, 200*9-48)
+    self:collide()
+    if self.hp <= 0 then
+        transition:init('menu')
+        level=1
+    end
 end
 
 function player:animate(dt)
@@ -122,11 +126,15 @@ function player:draw()
         local delta_y = cam[2]+my-40 - self.y+24
         self.angle = math.atan2(delta_y, delta_x)
         if sign(self.angle)==-1 then
-            love.graphics.draw(self.weaponImage,self.x, self.y+30,   self.angle  ,1,should_rotate(self.angle),-15+self.recoil,9)
+            love.graphics.draw(self.weapon_image,self.x, self.y+30,   self.angle  ,1,should_rotate(self.angle),-15+self.recoil,9)
         end
-        love.graphics.draw(self.Image, self.quads[self.sprite], self.x, self.y,0,self.scale_x,1,24,0)
+        if self.invincible >= 0 then
+            love.graphics.draw(self.dead_image, self.quads[1], self.x, self.y,0,self.scale_x,1,24,0)
+        else
+            love.graphics.draw(self.image, self.quads[self.sprite], self.x, self.y,0,self.scale_x,1,24,0)
+        end
         if sign(self.angle)==1 then
-            love.graphics.draw(self.weaponImage,self.x, self.y+30,   self.angle  ,1,should_rotate(self.angle),-15+self.recoil,9)
+            love.graphics.draw(self.weapon_image,self.x, self.y+30,   self.angle  ,1,should_rotate(self.angle),-15+self.recoil,9)
         end
         
         
@@ -206,7 +214,6 @@ function player:init_roll()
 end
 
 function player:roll(dt)
-
     local vec={x=0,y=0}
     if love.keyboard.isDown("w") then
         vec.y = vec.y - 1
@@ -227,9 +234,9 @@ end
 
 function player:set_image()
     if self.character == 1 then
-        self.weaponImage=love.graphics.newImage("images/weapons/1.png")
+        self.weapon_image=love.graphics.newImage("images/weapons/1.png")
     elseif self.character == 2 then
-        self.weaponImage=love.graphics.newImage("images/weapons/none.png")
+        self.weapon_image=love.graphics.newImage("images/weapons/none.png")
     end
 end
 
@@ -261,4 +268,17 @@ function player_melee(dx,dy)
         a = a + 0.1
     end
 
+end
+
+function player:collide()
+    for i,v in ipairs(enemies) do
+        if CheckCollision(self.x-24,self.y,48,48,v.x,v.y,48,48) then
+            if self.invincible < 0 then
+                self.hp = self.hp - 1
+                self.invincible = 0.3
+                set_shake(10,0.1)
+                flux.to(v, 0.2, { x = v.x + v.dist.x * 15, y = v.y + v.dist.y * 15}):ease('elasticout') 
+            end
+        end
+    end
 end

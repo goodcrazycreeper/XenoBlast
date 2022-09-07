@@ -13,8 +13,8 @@ function make_enemy(x,y,type)
     sprite=1,
     type=type,
     first=true,
-    image=love.graphics.newImage('images/characters/enemy-'..tostring(type)..'.png'),
-    death_image = love.graphics.newImage('images/characters/dead-enemy-'..tostring(type)..'.png'),
+    image=love.graphics.newImage('images/characters/enemies/enemy-'..tostring(type)..'.png'),
+    death_image = love.graphics.newImage('images/characters/enemies/dead-enemy-'..tostring(type)..'.png'),
     dist={0,0},
     offset={math.random(-50,50),math.random(-50,50)},
     --offset={0,0},
@@ -139,15 +139,15 @@ function update_enemies()
                 --make_particle(x,y,dx,dy,color,life,size,da,ds)
                 make_particle(enemies[i].x+24,enemies[i].y+24,dx,dy,{1,0.3,0.3,1},0.5,10,-2,-20)
             end
-            make_body_particle(enemies[i].x,enemies[i].y,enemies[i].death_dx,enemies[i].death_dy,'images/characters/dead-enemy-'..enemies[i].type..'.png')
+            make_body_particle(enemies[i].x,enemies[i].y,enemies[i].death_dx,enemies[i].death_dy,'images/characters/enemies/dead-enemy-'..enemies[i].type..'.png')
             table.remove(enemies,i)
         end
     end
 end
 
 function draw_enemies()
-    for i=1, #enemies do
-        enemies[i]:draw()
+    for i,v in  ipairs(enemies) do
+        v:draw()
     end
 end
 

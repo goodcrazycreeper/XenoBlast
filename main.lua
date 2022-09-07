@@ -28,7 +28,7 @@ sounds.laser_fire_sound = love.audio.newSource('sounds/laser.wav', 'static')
 sounds.select_sound = love.audio.newSource('sounds/select.wav', 'static')
 sounds.start_game_sound = love.audio.newSource('sounds/start_game.mp3', 'static')
 sounds.buzz = love.audio.newSource('sounds/buzz.mp3', 'static')
-
+print(#sounds)
 --src1:setVolume(0.9) -- 90% of ordinary volume
 --src1:setPitch(0.5) -- one octave lower
 
@@ -113,6 +113,7 @@ end
 
 function enter_state(index)
     if index=='intro' then
+        
         intro_timer=5
         logo_x = 1500
         love.graphics.setFont(love.graphics.newFont('fonts/slkscr.ttf',100))
@@ -158,7 +159,7 @@ function enter_state(index)
         --store character images
         my_character_images={}
         for i=1,8 do
-            table.insert(my_character_images,love.graphics.newImage('images/characters/character-'..tostring(i)..'.png'))
+            table.insert(my_character_images,love.graphics.newImage('images/characters/players/character-'..tostring(i)..'.png'))
         end
 
         --store the quads for the images
@@ -189,6 +190,7 @@ function enter_state(index)
         line_left=window_width/3
         line_right=window_width/3*2
     elseif index=='game' then
+        make_line()
         shadow_image=love.graphics.newImage('images/shadow.png')
         start_game()
         love.graphics.setBackgroundColor(0,0,0,1)
@@ -198,6 +200,7 @@ function enter_state(index)
         player:load()
         enemies={}
         spawn_timer=0
+        shake={0,0,0,0}
 
     elseif index=='pull' then
         shine={alpha=0}
@@ -391,6 +394,7 @@ function load_data()
         sounds.menu_music:setVolume((config_storage.music/100)*(config_storage.master/100))
         
         love.window.setFullscreen(config_storage.full)
+        change_volume()
     else
         character_storage={'1'}
         character_stats={}
@@ -398,9 +402,7 @@ function load_data()
         for i=1, 10 do
             table.insert(character_stats,{0,0,0})
         end
-        for i,v in ipairs(sounds) do
-            v:setVolume(1)
-        end
+        change_volume()
     end
 end
 
@@ -429,7 +431,7 @@ function pick_rarity()
 end
 
 function make_floor()
-    tiles={love.graphics.newImage('images/tiles/1.png'),love.graphics.newImage('images/tiles/2.png'),love.graphics.newImage('images/tiles/3.png')}
+    tiles={love.graphics.newImage('images/tiles/1.png'),love.graphics.newImage('images/tiles/2.png'),love.graphics.newImage('images/tiles/3.png'),love.graphics.newImage('images/tiles/4.png'),love.graphics.newImage('images/tiles/5.png')}
 
     floor_table = {}
     for n = 1,8 do
@@ -482,8 +484,11 @@ function draw_sound_menu()
 end
 
 function change_volume()
-    local width = left_arrow_image:getWidth()
-    local height = left_arrow_image:getHeight()
+    local width = 48
+    local height = 48
+    if not my or not mx then
+        mx, my = 0
+    end
     --master
     if CheckCollision(mx,my,1,1,600,325,width,height) then
         config_storage.master = config_storage.master - 10
@@ -509,8 +514,29 @@ function change_volume()
     config_storage.music = math.clamp(0, config_storage.music, 100) 
     config_storage.sfx = math.clamp(0, config_storage.sfx, 100) 
 
-    for i,v in ipairs(sounds) do
-        v:setVolume((config_storage.sfx/100)*(config_storage.master/100))
-    end
+    local sfx_volume = (config_storage.sfx/100)*(config_storage.master/100)
+    sounds.menu_music:setVolume(sfx_volume)
+    sounds.laser_fire_sound:setVolume(sfx_volume)
+    sounds.select_sound:setVolume(sfx_volume)
+    sounds.start_game_sound:setVolume(sfx_volume)
+    sounds.buzz:setVolume(sfx_volume)
+
     sounds.menu_music:setVolume((config_storage.music/100)*(config_storage.master/100))
+end
+
+function set_shake(input,time)
+    -- shakes left
+    shake[3] = input
+    shake[4] = time
+end
+
+function update_shake(dt)
+    if shake[4] >= 0 then
+        shake[1] = math.random(-shake[3],shake[3])
+        shake[2] = math.random(-shake[3],shake[3])
+        shake[4] = shake[4] - dt
+    else
+        shake[1] = 0
+        shake[2] = 0
+    end
 end
