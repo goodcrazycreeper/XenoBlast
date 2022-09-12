@@ -7,8 +7,7 @@ function start_game()
     begin_timer=3
 
     enemy_list = {}
-    starting_enemies = math.random(40,50)
-    starting_enemies= 2
+    starting_enemies = math.random(30,50)
     for i=0 , starting_enemies do
         local rnd = math.random(4)
         if rnd == 1 then
@@ -26,6 +25,7 @@ function update_spawn()
         spawn_timer = 0.15 + math.random(5)/10
         if  #enemy_list>1 then
             make_spawner_particle(math.random(100,1600),math.random(100,1600),enemy_list[#enemy_list-1])
+            --make_spawner_particle(math.random(100,1600),math.random(100,1600),5)
             table.remove(enemy_list,#enemy_list-1)
         end
     end
@@ -95,7 +95,11 @@ function ship:update()
 
     if self.switched and self.y <= -900 then
         self.switched = false
-        transition:init('game')
+        if level ~= 6 then
+            transition:init('game')
+        else
+            transition:init('menu')
+        end
         print('transition!')
     end
 

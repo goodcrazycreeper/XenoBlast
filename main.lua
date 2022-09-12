@@ -335,7 +335,6 @@ function mousepressed(x,y)
             if menu_selected_character > #character_storage then
                 menu_selected_character = #character_storage
             end
-       
             if menu_selected_character < 1 then
                 menu_selected_character = 1
             end
@@ -431,7 +430,7 @@ function pick_rarity()
 end
 
 function make_floor()
-    tiles={love.graphics.newImage('images/tiles/1.png'),love.graphics.newImage('images/tiles/2.png'),love.graphics.newImage('images/tiles/3.png'),love.graphics.newImage('images/tiles/4.png'),love.graphics.newImage('images/tiles/5.png')}
+    tiles={love.graphics.newImage('images/tiles/1.png'),love.graphics.newImage('images/tiles/2.png'),love.graphics.newImage('images/tiles/3.png'),love.graphics.newImage('images/tiles/4.png'),love.graphics.newImage('images/tiles/5.png'),love.graphics.newImage('images/tiles/6.png'),love.graphics.newImage('images/tiles/7.png')}
 
     floor_table = {}
     for n = 1,8 do

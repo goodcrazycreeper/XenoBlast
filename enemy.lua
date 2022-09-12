@@ -15,7 +15,7 @@ function make_enemy(x,y,type)
     first=true,
     image=love.graphics.newImage('images/characters/enemies/enemy-'..tostring(type)..'.png'),
     death_image = love.graphics.newImage('images/characters/enemies/dead-enemy-'..tostring(type)..'.png'),
-    dist={0,0},
+    dist={x=0,y=0},
     offset={math.random(-50,50),math.random(-50,50)},
     --offset={0,0},
     particle_timer=1,
@@ -25,6 +25,10 @@ function make_enemy(x,y,type)
     death_dy=0,
     damage=1,
     projectile_timer=0,
+    dash_timer=0,
+    set_x = 0,
+    set_y = 0,
+
 
     update = function(self)
         
@@ -46,9 +50,30 @@ function make_enemy(x,y,type)
                 self.hp = 5
                 self.speed = 100
                 self.damage=3
+            elseif self.type==5 then
+                self.hp = 6
+                self.speed = 150
+                self.damage= 4
+                self.dash_timer=4
             end
         end
 
+        if self.type==5 then
+            self.dash_timer= self.dash_timer - global_dt
+            if self.dash_timer  <= 4 and self.dash_timer >= 2 then
+                self.x = self.x + self.dist.x
+                self.y = self.y + self.dist.y
+                self.set_x = self.dist.x
+                self.set_y = self.dist.y
+            end
+            if self.dash_timer <= 2  then
+                self.x = self.x - self.set_x * 1
+                self.y = self.y - self.set_y * 1
+            end
+            if self.dash_timer <= 0 then
+                self.dash_timer = 4
+            end
+        end
 
         self.invincible = self.invincible - global_dt
         self.particle_timer = self.particle_timer - global_dt

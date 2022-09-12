@@ -7,7 +7,7 @@ function player:load()
     self.y=1000
     self.sprite=1
     self.maxhp=10
-    self.speed=150
+    self.speed=200
     self.hp=10
     self.walking=false
     self.character=menu_selected_character
