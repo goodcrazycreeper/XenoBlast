@@ -1,1 +1,1 @@
-"C:\Users\elijo\Downloads\love-11.4-win64\lovec" "%cd%"
+start "" "LOVE\lovec.exe" "%cd%"
